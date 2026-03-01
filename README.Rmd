@@ -9,8 +9,9 @@ output: github_document
 <!-- badges: start -->
 <!-- Si activas GitHub Actions con usethis::use_github_action_check_standard(),
      descomenta el badge de R-CMD-check y ajusta USUARIO/REPO -->
- [![R-CMD-check](https://github.com/SilviaNovo/qarPI/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SilviaNovo/qarPI/actions/workflows/R-CMD-check.yaml) 
+ <!--[![R-CMD-check](https://github.com/SilviaNovo/qarPI/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SilviaNovo/qarPI/actions/workflows/R-CMD-check.yaml) -->
  [![License: GPL v3](https://img.shields.io/badge/License-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+ [![arXiv](https://img.shields.io/badge/arXiv-2512.22018-b31b1b.svg)](https://doi.org/10.48550/arXiv.2512.22018)
 <!-- badges: end -->
 
 
@@ -38,7 +39,7 @@ Within each model class, bootstrap PIs may therefore be obtained via:
 
 ### Installation
 
-```r
+```{r,results='hide',message=FALSE,warning=FALSE}
 # install the package
 devtools::install_github("SilviaNovo/qarPI")
 
@@ -51,17 +52,21 @@ library(qarPI)
 
 ### 1. AR(p)-based PIs
 
-#### Analytical PIs: Box-Jenkins
 
-- **BJ** — Box–Jenkins type analytical PIs assuming Gaussian innovations  
-  → `pi_BJ()`
+#### Percentile-based bootstrap  PIs
+
+Bootstrap procedures constructed under the AR(p) framework using the percentile principle
+
+- **AR-perc** — Bootstrap algorithm based on quantile estimation and bootstrap multipliers (Novo & Sanchez-Sellero, 2025)
+  → `pi_AR_perc()`
   
-```r
+```{r}
+
 set.seed(123)
 y <- arima.sim(model = list(ar = 0.6), n = 300)
 
-# Classical Box–Jenkins PI
-pi <- pi_BJ(y, p = 1, h = 3)
+# AR-perc PI
+pi <- pi_AR_perc(y, p = 1, h = 3)
 
 t_PI <- data.frame(
   Lower = pi$lpi,
@@ -70,16 +75,11 @@ t_PI <- data.frame(
 )
 t_PI
 ```
----
-
-#### Percentile-based bootstrap  PIs
-
-Bootstrap procedures constructed under the AR(p) framework using the percentile principle
 
 - **TS** — Backward bootstrap (Thombs & Schucany, 1990)  
   → `pi_TS()`
   
-```r
+```{r}
 # Thombs & Schucany PI
 pi <- pi_TS(y, p = 1, h = 3)
 
@@ -94,7 +94,7 @@ t_PI
 - **CB** — Conditional bootstrap (Cao et al., 1997)  
   → `pi_CB()`
   
-```r
+```{r}
 # Cao et al. PI
 pi <- pi_CB(y, p = 1, h = 3)
 
@@ -109,7 +109,7 @@ t_PI
 - **PRR** — Forward bootstrap  (Pascual, Romo & Ruiz, 2004) using ordinary least squares (OLS) or least absolute deviations (LAD) estimation 
   → `pi_PRR()`
   
-```r
+```{r}
 # Pascual et al. PI. OLS
 pi <- pi_PRR(y, p = 1, h = 3, method="OLS")
 
@@ -132,12 +132,22 @@ t_PI
 
 ``` 
 
-- **AR-perc** — Bootstrap algorithm based on quantile estimation and bootstrap multipliers (Novo & Sanchez-Sellero, 2025)
-  → `pi_AR_perc()`
-  
-```r
-# AR-perc PI
-pi <- pi_AR_perc(y, p = 1, h = 3)
+
+
+---
+
+
+
+#### Predictive-root-based bootstrap PIs
+
+Bootstrap intervals constructed using the predictive root approach
+
+- **AR-proot** — Bootstrap algorithm based on quantile estimation, bootstrap multipliers and predictive residuals (Novo & Sanchez-Sellero, 2025)
+  → `pi_AR_proot()`
+
+```{r}
+# AR-proot PI
+pi <- pi_AR_proot(y, p = 1, h = 3)
 
 t_PI <- data.frame(
   Lower = pi$lpi,
@@ -145,19 +155,14 @@ t_PI <- data.frame(
   Length = pi$len
 )
 t_PI
-```
+``` 
 
----
-
-#### Predictive-root bootstrap PIs
-
-Bootstrap intervals constructed using the predictive root approach
 
 - **PP** — Forward bootstrap with predictive residuals  (Pan & Politis, 2016, denoted by the 
 authors as *Fp*). 
   → `pi_PP()`
   
-```r
+```{r}
 # Pan & Politis PI
 pi <- pi_PP(y, p = 1, h = 3)
 
@@ -170,12 +175,16 @@ t_PI
 ``` 
   
   
-- **AR-proot** — Bootstrap algorithm based on quantile estimation, bootstrap multipliers and predictive residuals (Novo & Sanchez-Sellero, 2025)
-  → `pi_AR_proot()`
 
-```r
-# AR-proot PI
-pi <- pi_AR_proot(y, p = 1, h = 3)
+#### Analytical PIs: Box-Jenkins
+
+- **BJ** — Box–Jenkins type analytical PIs assuming Gaussian innovations  
+  → `pi_BJ()`
+  
+```{r}
+
+# Classical Box–Jenkins PI
+pi <- pi_BJ(y, p = 1, h = 3)
 
 t_PI <- data.frame(
   Lower = pi$lpi,
@@ -183,7 +192,8 @@ t_PI <- data.frame(
   Length = pi$len
 )
 t_PI
-``` 
+```
+---
 
 ---
 
@@ -195,25 +205,10 @@ Prediction intervals constructed under the QAR(p) framework
 
 #### Percentile-based bootstrap PIs
 
-- **X** — Bootstrap algorithm suggested by Xiao (2012)  
-  → `pi_X()`
-  
-```r
-# Xiao PI
-pi <- pi_X(y, p = 1, h = 3)
-
-t_PI <- data.frame(
-  Lower = pi$lpi,
-  Upper = pi$upi,
-  Length = pi$len
-)
-t_PI
-``` 
-  
 - **QAR-perc** — Bootstrap algorithm based on quantile estimation and bootstrap multipliers (Novo & Sanchez-Sellero, 2025)
   → `pi_QAR_perc()`
 
-```r
+```{r}
 # QAR-perc PI
 pi <- pi_QAR_perc(y, p = 1, h = 3)
 
@@ -225,6 +220,23 @@ t_PI <- data.frame(
 t_PI
 ```  
 
+- **X** — Bootstrap algorithm suggested by Xiao (2012)  
+  → `pi_X()`
+  
+```{r}
+# Xiao PI
+pi <- pi_X(y, p = 1, h = 3)
+
+t_PI <- data.frame(
+  Lower = pi$lpi,
+  Upper = pi$upi,
+  Length = pi$len
+)
+t_PI
+``` 
+  
+
+
 
 ---
 
@@ -233,7 +245,7 @@ t_PI
 - **QAR-proot** — Bootstrap algorithm based on quantile estimation, bootstrap multipliers and predictive residuals (Novo & Sanchez-Sellero, 2025)
   → `pi_QAR_proot()`
   
-```r
+```{r}
 # QAR-proot PI
 pi <- pi_QAR_proot(y, p = 1, h = 3)
 
@@ -254,23 +266,23 @@ t_PI
 qarPI
 │
 ├── AR(p)
-│   ├── Analytical
-│   │   └── BJ → pi_BJ()
-│   │
 │   ├── Percentile-based Bootstrap
+│   │   ├── AR-perc → pi_AR_perc()
 │   │   ├── TS → pi_TS()
 │   │   ├── CB → pi_CB()
-│   │   ├── PRR → pi_PRR()
-│   │   └── AR-perc → pi_AR_perc()
+│   │   └── PRR → pi_PRR()
 │   │
-│   └── Predictive-root-based Bootstrap
-│       ├── PP (Fp) → pi_PP()
-│       └── AR-proot → pi_AR_proot()
+│   ├── Predictive-root-based Bootstrap
+│   │   ├── AR-proot → pi_AR_proot()
+│   │   └── PP (Fp) → pi_PP()
+│   │
+│   └── Analytical
+│       └── BJ → pi_BJ()
 │
 └── QAR(p)
     ├── Percentile-based Bootstrap
-    │   ├── X → pi_X()
-    │   └── QAR-perc → pi_QAR_perc()
+    │   ├── QAR-perc → pi_QAR_perc()
+    │   └── X → pi_X()
     │
     └── Predictive-root-based Bootstrap
         └── QAR-proot → pi_QAR_proot()

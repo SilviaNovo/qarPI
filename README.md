@@ -7,9 +7,10 @@
 <!-- Si activas GitHub Actions con usethis::use_github_action_check_standard(),
      descomenta el badge de R-CMD-check y ajusta USUARIO/REPO -->
 
-[![R-CMD-check](https://github.com/SilviaNovo/qarPI/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SilviaNovo/qarPI/actions/workflows/R-CMD-check.yaml)
+<!--[![R-CMD-check](https://github.com/SilviaNovo/qarPI/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SilviaNovo/qarPI/actions/workflows/R-CMD-check.yaml) -->
 [![License: GPL
 v3](https://img.shields.io/badge/License-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![arXiv](https://img.shields.io/badge/arXiv-2512.22018-b31b1b.svg)](https://doi.org/10.48550/arXiv.2512.22018)
 <!-- badges: end -->
 
 The package provides prediction intervals (PIs) under two model classes:
@@ -50,18 +51,20 @@ library(qarPI)
 
 ### 1. AR(p)-based PIs
 
-#### Analytical PIs: Box-Jenkins
+#### Percentile-based bootstrap PIs
 
-- **BJ** — Box–Jenkins type analytical PIs assuming Gaussian
-  innovations  
-  → `pi_BJ()`
+Bootstrap procedures constructed under the AR(p) framework using the
+percentile principle
+
+- **AR-perc** — Bootstrap algorithm based on quantile estimation and
+  bootstrap multipliers (Novo & Sanchez-Sellero, 2025) → `pi_AR_perc()`
 
 ``` r
 set.seed(123)
 y <- arima.sim(model = list(ar = 0.6), n = 300)
 
-# Classical Box–Jenkins PI
-pi <- pi_BJ(y, p = 1, h = 3)
+# AR-perc PI
+pi <- pi_AR_perc(y, p = 1, h = 3)
 
 t_PI <- data.frame(
   Lower = pi$lpi,
@@ -71,12 +74,10 @@ t_PI <- data.frame(
 t_PI
 ```
 
-------------------------------------------------------------------------
-
-#### Percentile-based bootstrap PIs
-
-Bootstrap procedures constructed under the AR(p) framework using the
-percentile principle
+    ##       Lower    Upper   Length
+    ## 1 -1.849219 1.828965 3.678184
+    ## 2 -2.122772 2.202761 4.325532
+    ## 3 -2.171773 2.409590 4.581363
 
 - **TS** — Backward bootstrap (Thombs & Schucany, 1990)  
   → `pi_TS()`
@@ -93,6 +94,11 @@ t_PI <- data.frame(
 t_PI
 ```
 
+    ##       Lower    Upper   Length
+    ## 1 -1.809166 1.961925 3.771091
+    ## 2 -2.062066 2.340589 4.402655
+    ## 3 -2.116774 2.275783 4.392557
+
 - **CB** — Conditional bootstrap (Cao et al., 1997)  
   → `pi_CB()`
 
@@ -108,6 +114,11 @@ t_PI <- data.frame(
 t_PI
 ```
 
+    ##       Lower    Upper   Length
+    ## 1 -1.819219 1.889094 3.708313
+    ## 2 -2.085047 2.205806 4.290853
+    ## 3 -2.068545 2.460602 4.529146
+
 - **PRR** — Forward bootstrap (Pascual, Romo & Ruiz, 2004) using
   ordinary least squares (OLS) or least absolute deviations (LAD)
   estimation → `pi_PRR()`
@@ -122,7 +133,14 @@ t_PI <- data.frame(
   Length = pi$len
 )
 t_PI
+```
 
+    ##       Lower    Upper   Length
+    ## 1 -1.866294 1.906787 3.773081
+    ## 2 -2.003852 2.309888 4.313740
+    ## 3 -2.116450 2.481027 4.597478
+
+``` r
 # Pascual et al. PI. LAD
 pi <- pi_PRR(y, p = 1, h = 3, method="LAD")
 
@@ -134,41 +152,16 @@ t_PI <- data.frame(
 t_PI
 ```
 
-- **AR-perc** — Bootstrap algorithm based on quantile estimation and
-  bootstrap multipliers (Novo & Sanchez-Sellero, 2025) → `pi_AR_perc()`
-
-``` r
-# AR-perc PI
-pi <- pi_AR_perc(y, p = 1, h = 3)
-
-t_PI <- data.frame(
-  Lower = pi$lpi,
-  Upper = pi$upi,
-  Length = pi$len
-)
-t_PI
-```
+    ##       Lower    Upper   Length
+    ## 1 -1.883711 1.882117 3.765828
+    ## 2 -1.993665 2.283575 4.277240
+    ## 3 -2.159428 2.409537 4.568965
 
 ------------------------------------------------------------------------
 
-#### Predictive-root bootstrap PIs
+#### Predictive-root-based bootstrap PIs
 
 Bootstrap intervals constructed using the predictive root approach
-
-- **PP** — Forward bootstrap with predictive residuals (Pan & Politis,
-  2016, denoted by the authors as *Fp*). → `pi_PP()`
-
-``` r
-# Pan & Politis PI
-pi <- pi_PP(y, p = 1, h = 3)
-
-t_PI <- data.frame(
-  Lower = pi$lpi,
-  Upper = pi$upi,
-  Length = pi$len
-)
-t_PI
-```
 
 - **AR-proot** — Bootstrap algorithm based on quantile estimation,
   bootstrap multipliers and predictive residuals (Novo &
@@ -186,6 +179,56 @@ t_PI <- data.frame(
 t_PI
 ```
 
+    ##       Lower    Upper   Length
+    ## 1 -1.778688 1.944880 3.723568
+    ## 2 -2.063616 2.239408 4.303024
+    ## 3 -2.043930 2.589753 4.633683
+
+- **PP** — Forward bootstrap with predictive residuals (Pan & Politis,
+  2016, denoted by the authors as *Fp*). → `pi_PP()`
+
+``` r
+# Pan & Politis PI
+pi <- pi_PP(y, p = 1, h = 3)
+
+t_PI <- data.frame(
+  Lower = pi$lpi,
+  Upper = pi$upi,
+  Length = pi$len
+)
+t_PI
+```
+
+    ##       Lower    Upper   Length
+    ## 1 -1.848580 1.952997 3.801577
+    ## 2 -2.159115 2.209435 4.368550
+    ## 3 -2.162428 2.142813 4.305242
+
+#### Analytical PIs: Box-Jenkins
+
+- **BJ** — Box–Jenkins type analytical PIs assuming Gaussian
+  innovations  
+  → `pi_BJ()`
+
+``` r
+# Classical Box–Jenkins PI
+pi <- pi_BJ(y, p = 1, h = 3)
+
+t_PI <- data.frame(
+  Lower = pi$lpi,
+  Upper = pi$upi,
+  Length = pi$len
+)
+t_PI
+```
+
+    ##       Lower    Upper   Length
+    ## 1 -2.023091 1.737312 3.760403
+    ## 2 -2.205069 2.090839 4.295908
+    ## 3 -2.232970 2.213495 4.446464
+
+------------------------------------------------------------------------
+
 ------------------------------------------------------------------------
 
 ### 2. QAR(p)-based PIs
@@ -195,6 +238,26 @@ Prediction intervals constructed under the QAR(p) framework
 ------------------------------------------------------------------------
 
 #### Percentile-based bootstrap PIs
+
+- **QAR-perc** — Bootstrap algorithm based on quantile estimation and
+  bootstrap multipliers (Novo & Sanchez-Sellero, 2025) → `pi_QAR_perc()`
+
+``` r
+# QAR-perc PI
+pi <- pi_QAR_perc(y, p = 1, h = 3)
+
+t_PI <- data.frame(
+  Lower = pi$lpi,
+  Upper = pi$upi,
+  Length = pi$len
+)
+t_PI
+```
+
+    ##       Lower    Upper   Length
+    ## 1 -1.858576 1.860805 3.719380
+    ## 2 -2.137675 2.037932 4.175606
+    ## 3 -2.113105 2.394030 4.507136
 
 - **X** — Bootstrap algorithm suggested by Xiao (2012)  
   → `pi_X()`
@@ -211,20 +274,10 @@ t_PI <- data.frame(
 t_PI
 ```
 
-- **QAR-perc** — Bootstrap algorithm based on quantile estimation and
-  bootstrap multipliers (Novo & Sanchez-Sellero, 2025) → `pi_QAR_perc()`
-
-``` r
-# QAR-perc PI
-pi <- pi_QAR_perc(y, p = 1, h = 3)
-
-t_PI <- data.frame(
-  Lower = pi$lpi,
-  Upper = pi$upi,
-  Length = pi$len
-)
-t_PI
-```
+    ##       Lower    Upper   Length
+    ## 1 -1.836173 1.916079 3.752252
+    ## 2 -2.066253 2.279619 4.345872
+    ## 3 -2.163826 2.320773 4.484599
 
 ------------------------------------------------------------------------
 
@@ -246,6 +299,11 @@ t_PI <- data.frame(
 t_PI
 ```
 
+    ##       Lower    Upper   Length
+    ## 1 -1.826982 1.894856 3.721838
+    ## 2 -2.051728 2.082905 4.134633
+    ## 3 -2.047210 2.464404 4.511614
+
 ------------------------------------------------------------------------
 
 ## Summary Structure
@@ -254,23 +312,23 @@ t_PI
 qarPI
 │
 ├── AR(p)
-│   ├── Analytical
-│   │   └── BJ → pi_BJ()
-│   │
 │   ├── Percentile-based Bootstrap
+│   │   ├── AR-perc → pi_AR_perc()
 │   │   ├── TS → pi_TS()
 │   │   ├── CB → pi_CB()
-│   │   ├── PRR → pi_PRR()
-│   │   └── AR-perc → pi_AR_perc()
+│   │   └── PRR → pi_PRR()
 │   │
-│   └── Predictive-root-based Bootstrap
-│       ├── PP (Fp) → pi_PP()
-│       └── AR-proot → pi_AR_proot()
+│   ├── Predictive-root-based Bootstrap
+│   │   ├── AR-proot → pi_AR_proot()
+│   │   └── PP (Fp) → pi_PP()
+│   │
+│   └── Analytical
+│       └── BJ → pi_BJ()
 │
 └── QAR(p)
     ├── Percentile-based Bootstrap
-    │   ├── X → pi_X()
-    │   └── QAR-perc → pi_QAR_perc()
+    │   ├── QAR-perc → pi_QAR_perc()
+    │   └── X → pi_X()
     │
     └── Predictive-root-based Bootstrap
         └── QAR-proot → pi_QAR_proot()
