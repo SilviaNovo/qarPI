@@ -22,3 +22,5 @@ Imports:
     quantreg
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
+URL: https://github.com/SilviaNovo/qarPI
+BugReports: https://github.com/SilviaNovo/qarPI/issues
