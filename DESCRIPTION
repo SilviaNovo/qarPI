@@ -1,0 +1,24 @@
+Package: qarPI
+Type: Package
+Title: Prediction Intervals for Quantile Autoregression
+Version: 0.1.0
+Authors@R: 
+    c(
+      person("Silvia", "Novo", 
+             role = c("aut", "cre"),
+             email = "snovo@est-econ.uc3m.es"),
+      person("César", "Sánchez-Sellero",
+             role = "aut")
+    )
+Description: Provides prediction intervals for classical (homoscedastic) 
+    autoregressive models (AR(p)) and quantile autoregressive models (QAR(p)). 
+    The package implements both percentile-based and predictive-root-based 
+    bootstrap procedures for multi-step-ahead prediction interval construction.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports:
+    stats,
+    quantreg
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
