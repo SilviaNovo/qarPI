@@ -49,7 +49,7 @@ library(qarPI)
 
 ------------------------------------------------------------------------
 
-### 1. AR(p)-based PIs
+### 1. PI methods for AR(p) models
 
 #### Percentile-based bootstrap PIs
 
@@ -231,7 +231,7 @@ t_PI
 
 ------------------------------------------------------------------------
 
-### 2. QAR(p)-based PIs
+### 2. PI methods for QAR(p) models
 
 Prediction intervals constructed under the QAR(p) framework
 

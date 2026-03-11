@@ -133,7 +133,7 @@ pi_PP <- function(series, p = 1, h = 3, B = 1000, alpha = 0.05) {
   # --------------------
   # Resampling (forward bootstrap + predictive root)
   # --------------------
-  m <- 100L  # burn-in
+  m <- 100  # burn-in
   b.root <- matrix(0, ncol = B, nrow = h)
 
   for (b in 1:B) {
@@ -161,7 +161,7 @@ pi_PP <- function(series, p = 1, h = 3, B = 1000, alpha = 0.05) {
     y.star <- x.star[(p + 1):n]
     m.ols.star <- stats::lm(y.star ~ xp.star)
 
-    # bootstrap future values x^* (predicted under bootstrapped coefficients)
+    # bootstrap predicted values x^* (predicted under bootstrapped coefficients)
     x.star.hat.fut <- numeric(p + h)
     x.star.hat.fut[1:p] <- series[(n - p + 1):n]
     for (t in 1:h) {
